@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Поиск попутчиков"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/etFrom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Откуда (напр. Москва)"/>
+
+    <EditText
+        android:id="@+id/etTo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Куда (напр. Тверь)"/>
+
+    <EditText
+        android:id="@+id/etDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Дата (ГГГГ-ММ-ДД)"
+        android:inputType="date"/>
+
+    <Button
+        android:id="@+id/btnSearch"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Найти поездки"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"/>
+
+    <!-- Сюда будем выводить список -->
+    <TextView
+        android:id="@+id/tvNoResults"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Подходящих поездок нет. Подпишитесь на уведомления!"
+        android:visibility="gone"
+        android:textColor="#FF0000"
+        android:textStyle="bold"/>
+
+    <ListView
+        android:id="@+id/listViewTrips"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#CCCCCC"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="--- Тест: Роль Водителя ---"
+        android:textStyle="bold"
+        android:layout_gravity="center_horizontal"/>
+
+    <Button
+        android:id="@+id/btnConfirmBooking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Водитель: Подтвердить последнюю бронь"
+        android:layout_marginTop="5dp"/>
+
+    <Button
+        android:id="@+id/btnLeaveReview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Пассажир: Оставить отзыв (5 звезд)"
+        android:layout_marginTop="5dp"/>
+</LinearLayout>
