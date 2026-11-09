@@ -10,17 +10,36 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PoputchikApp">
+        android:theme="@style/Theme.PoputchikApp"
+        tools:targetApi="31">
+
+        <!-- 1. Стартовый экран (Выбор роли) -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:windowSoftInputMode="adjustResize">
+            android:name=".RoleSelectActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- 2. Экран пассажира (Поиск) -->
+        <activity android:name=".MainActivity" />
+
+        <!-- 3. Экран водителя (Создание поездки) -->
+        <activity android:name=".AddTripActivity" />
+
+        <!-- 4. Экран "Мои поездки" для водителя -->
+        <activity android:name=".DriverTripsActivity" />
+
+        <!-- 5. Экран со списком заявок (Подтверждение брони) -->
+        <activity android:name=".BookingListActivity" />
+
+        <!-- 6. Экран "Мои бронирования" для пассажира -->
+        <activity android:name=".MyBookingsActivity" />
+
+        <activity android:name=".PassengerListActivity" />
+
     </application>
 
 </manifest>

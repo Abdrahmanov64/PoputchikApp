@@ -1,5 +1,6 @@
 package com.example.poputchikapp;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.View;
@@ -9,13 +10,14 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 public class MainActivity extends AppCompatActivity {
 
     DatabaseHelper dbHelper;
     EditText etFrom, etTo, etDate;
-    Button btnSearch;
+    Button btnSearch, btnMyBookings;
     ListView listViewTrips;
     TextView tvNoResults;
 
@@ -29,42 +31,29 @@ public class MainActivity extends AppCompatActivity {
         etTo = findViewById(R.id.etTo);
         etDate = findViewById(R.id.etDate);
         btnSearch = findViewById(R.id.btnSearch);
+        btnMyBookings = findViewById(R.id.btnMyBookings);
         listViewTrips = findViewById(R.id.listViewTrips);
         tvNoResults = findViewById(R.id.tvNoResults);
 
-        // Кнопка Поиска
-        btnSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                searchTrips();
-            }
+        etDate.setOnClickListener(v -> {
+            java.util.Calendar c = java.util.Calendar.getInstance();
+            new android.app.DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
+                month = month + 1;
+                String formattedMonth = (month < 10) ? "0" + month : String.valueOf(month);
+                String formattedDay = (dayOfMonth < 10) ? "0" + dayOfMonth : String.valueOf(dayOfMonth);
+                etDate.setText(year + "-" + formattedMonth + "-" + formattedDay);
+            }, c.get(java.util.Calendar.YEAR), c.get(java.util.Calendar.MONTH), c.get(java.util.Calendar.DAY_OF_MONTH)).show();
         });
 
-        // Для теста сразу загрузим все поездки при старте
+        btnSearch.setOnClickListener(v -> searchTrips());
+
+        btnMyBookings.setOnClickListener(v -> {
+            startActivity(new Intent(this, MyBookingsActivity.class));
+        });
+        Button btnBackToRole = findViewById(R.id.btnBackToRoleSelect);
+        btnBackToRole.setOnClickListener(v -> finish()); // finish() закрывает экран и возвращает на предыдущий (RoleSelectActivity)
+
         searchTrips();
-
-        // --- ЛОГИКА ДЛЯ ТЕСТИРОВАНИЯ ДИАГРАММ 2 И 3 ---
-        Button btnConfirmBooking = findViewById(R.id.btnConfirmBooking);
-        Button btnLeaveReview = findViewById(R.id.btnLeaveReview);
-
-        // Симуляция действия Водителя (Диаграмма 2)
-        btnConfirmBooking.setOnClickListener(v -> {
-            dbHelper.confirmBooking(1); // Подтверждаем бронь с ID 1
-            Toast.makeText(this, "Водитель подтвердил! Статус: confirmed. Push-уведомление отправлено пассажиру.", Toast.LENGTH_LONG).show();
-        });
-
-        // Симуляция действия Пассажира - Отзыв (Диаграмма 3)
-        btnLeaveReview.setOnClickListener(v -> {
-            int testTripId = 1;
-            String status = dbHelper.getBookingStatus(testTripId);
-
-            if (status.equals("confirmed")) {
-                dbHelper.addReview(testTripId, 5, "Отличная поездка, довез быстро!");
-                Toast.makeText(this, "Отзыв добавлен в БД! Рейтинг водителя обновлен.", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Нельзя оставить отзыв! Сначала нажмите 'Подтвердить бронь'.", Toast.LENGTH_LONG).show();
-            }
-        });
     }
 
     private void searchTrips() {
@@ -75,54 +64,33 @@ public class MainActivity extends AppCompatActivity {
         Cursor cursor = dbHelper.getTrips(from, to, date);
 
         if (cursor.getCount() == 0) {
-            // Ветка "Нет"
             listViewTrips.setVisibility(View.GONE);
             tvNoResults.setVisibility(View.VISIBLE);
         } else {
-            // Ветка "Да"
             listViewTrips.setVisibility(View.VISIBLE);
             tvNoResults.setVisibility(View.GONE);
 
-            String[] fromColumns = {
-                    DatabaseHelper.COL_TRIP_FROM,
-                    DatabaseHelper.COL_TRIP_TO,
-                    DatabaseHelper.COL_TRIP_DATE,
-                    DatabaseHelper.COL_TRIP_PRICE
-            };
-
-            int[] toViews = {
-                    R.id.tvItemRoute,
-                    R.id.tvItemDate,
-                    R.id.tvItemPrice
-            };
-
             SimpleCursorAdapter adapter = new SimpleCursorAdapter(
-                    this,
-                    R.layout.item_trip,
-                    cursor,
-                    new String[]{
-                            DatabaseHelper.COL_TRIP_FROM,
-                            DatabaseHelper.COL_TRIP_TO,
-                            DatabaseHelper.COL_TRIP_DATE,
-                            DatabaseHelper.COL_TRIP_PRICE
-                    },
-                    new int[]{
-                            R.id.tvItemRoute,
-                            R.id.tvItemRoute,
-                            R.id.tvItemDate,
-                            R.id.tvItemPrice
-                    },
+                    this, R.layout.item_trip, cursor,
+                    new String[]{DatabaseHelper.COL_TRIP_FROM, DatabaseHelper.COL_TRIP_TO, DatabaseHelper.COL_TRIP_DATE, "free_seats"},
+                    new int[]{R.id.tvItemRoute, R.id.tvItemRoute, R.id.tvItemDate, R.id.tvItemPrice},
                     0
             );
 
-            // Красиво склеиваем "Москва ➔ Тверь"
             adapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
                 @Override
-                public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+                public boolean setViewValue(View view, Cursor c, int columnIndex) {
                     if (view.getId() == R.id.tvItemRoute) {
-                        String fromCity = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TRIP_FROM));
-                        String toCity = cursor.getString(cursor.getColumnIndexOrThrow(DatabaseHelper.COL_TRIP_TO));
-                        ((TextView) view).setText(fromCity + " ➔ " + toCity);
+                        String f = c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COL_TRIP_FROM));
+                        String t = c.getString(c.getColumnIndexOrThrow(DatabaseHelper.COL_TRIP_TO));
+                        ((TextView) view).setText(f + " ➔ " + t);
+                        return true;
+                    }
+                    if (view.getId() == R.id.tvItemPrice) {
+                        // Показываем цену и свободные места
+                        int free = c.getInt(c.getColumnIndexOrThrow("free_seats"));
+                        double price = c.getDouble(c.getColumnIndexOrThrow(DatabaseHelper.COL_TRIP_PRICE));
+                        ((TextView) view).setText(price + " руб. (Свободно: " + free + ")");
                         return true;
                     }
                     return false;
@@ -131,13 +99,42 @@ public class MainActivity extends AppCompatActivity {
 
             listViewTrips.setAdapter(adapter);
 
-            // Клик по поездке = создание брони
+            // Обработка клика - диалог выбора количества мест
             listViewTrips.setOnItemClickListener((parent, view, position, id) -> {
-                boolean success = dbHelper.createBooking((int)id, 2);
-                if(success){
-                    Toast.makeText(MainActivity.this, "Бронирование создано! Ожидайте подтверждения.", Toast.LENGTH_LONG).show();
-                }
+                int tripId = (int) id;
+                showSeatSelectionDialog(tripId);
             });
         }
+    }
+
+    // Диалог для выбора количества мест
+    private void showSeatSelectionDialog(int tripId) {
+        final EditText input = new EditText(this);
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER);
+        input.setHint("Введите количество мест");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Бронирование")
+                .setMessage("Сколько мест вы хотите забронировать?")
+                .setView(input)
+                .setPositiveButton("Забронировать", (dialog, which) -> {
+                    String seatsStr = input.getText().toString();
+                    if (seatsStr.isEmpty()) {
+                        Toast.makeText(this, "Введите количество!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    int seats = Integer.parseInt(seatsStr);
+
+                    // Пытаемся создать бронь
+                    boolean success = dbHelper.createBooking(tripId, 2, seats); // 2 - тестовый пассажир
+
+                    if (success) {
+                        Toast.makeText(this, "Забронировано " + seats + " мест! Ожидайте подтверждения.", Toast.LENGTH_LONG).show();
+                    } else {
+                        Toast.makeText(this, "Ошибка: не хватает свободных мест!", Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setNegativeButton("Отмена", null)
+                .show();
     }
 }

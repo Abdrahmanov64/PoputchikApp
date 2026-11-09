@@ -29,8 +29,10 @@
         android:id="@+id/etDate"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Дата (ГГГГ-ММ-ДД)"
-        android:inputType="date"/>
+        android:hint="Дата (нажмите для выбора)"
+        android:focusable="false"
+        android:clickable="true"
+        android:inputType="none"/>
 
     <Button
         android:id="@+id/btnSearch"
@@ -40,7 +42,6 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"/>
 
-    <!-- Сюда будем выводить список -->
     <TextView
         android:id="@+id/tvNoResults"
         android:layout_width="match_parent"
@@ -48,38 +49,42 @@
         android:text="Подходящих поездок нет. Подпишитесь на уведомления!"
         android:visibility="gone"
         android:textColor="#FF0000"
-        android:textStyle="bold"/>
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
 
     <ListView
         android:id="@+id/listViewTrips"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#CCCCCC"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="--- Тест: Роль Водителя ---"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"/>
-
     <Button
-        android:id="@+id/btnConfirmBooking"
+        android:id="@+id/btnMyBookings"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Водитель: Подтвердить последнюю бронь"
-        android:layout_marginTop="5dp"/>
+        android:text="Мои бронирования"
+        android:layout_marginBottom="8dp"/>
 
     <Button
         android:id="@+id/btnLeaveReview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Пассажир: Оставить отзыв (5 звезд)"
-        android:layout_marginTop="5dp"/>
+        android:layout_marginBottom="8dp"/>
+
+    <!-- НОВАЯ КНОПКА НАЗАД -->
+    <Button
+        android:id="@+id/btnBackToRoleSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Назад к выбору роли"
+        style="?android:attr/buttonStyleSmall"/>
+
 </LinearLayout>
